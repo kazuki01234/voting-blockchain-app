@@ -1,7 +1,6 @@
 .env
 
-/data/*
-!data/voters.json
+/backend/data/*
 
 __pycache__/
 *.pyc
