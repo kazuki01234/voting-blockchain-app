@@ -1,0 +1,7 @@
+.env
+
+/data/*
+!data/voters.json
+
+__pycache__/
+*.pyc
