@@ -1,11 +1,17 @@
-import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { VoteForm } from "./components/VoteForm";
+import ResultsPage from "./pages/ResultsPage";
 
-export const App = () => {
+const App = () => {
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <VoteForm />
-    </main>
+    <Router>
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Routes>
+          <Route path="/" element={<VoteForm />} />
+          <Route path="/results" element={<ResultsPage />} />
+        </Routes>
+      </main>
+    </Router>
   );
 };
 
