@@ -1,6 +1,7 @@
 .env
 
 /backend/data/*
+folder_structure.txt
 
 __pycache__/
 *.pyc

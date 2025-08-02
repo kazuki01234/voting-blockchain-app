@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useKeys } from "../hooks/useKeys";
 import { signMessage } from "../crypto";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const languages = ["Python", "JavaScript", "Rust", "Go"];
 
@@ -9,6 +10,7 @@ export const VoteForm = () => {
   const { getKeys, saveKeys } = useKeys();
   const [selected, setSelected] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   // ✅ 鍵がなければ生成して保存
   useEffect(() => {
@@ -43,6 +45,11 @@ export const VoteForm = () => {
       });
       console.log("✅ サーバー応答:", res.data);
       setStatus("✅ 投票に成功しました！");
+
+      setTimeout(() => {
+        navigate("/results");
+      }, 1000);
+
     } catch (err: unknown) {
         if (err instanceof Error) {
           console.error(err.message);

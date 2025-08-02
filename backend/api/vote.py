@@ -1,10 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from crypto.keys import verify_vote
-from blockchain.blockchain import Blockchain
+from blockchain.shared import blockchain
 
 router = APIRouter()
-blockchain = Blockchain()
 
 class VoteRequest(BaseModel):
     voter_public_key: str
