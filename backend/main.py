@@ -19,4 +19,4 @@ app.include_router(chain.router, prefix="/chain")
 
 @app.get("/")
 def root():
-    return {"message": "電子投票システムAPI"}
+    return {"message": "Blockchain-based Voting System API"}

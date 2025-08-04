@@ -19,5 +19,5 @@ def get_results() -> Dict[str, int]:
             if vote:
                 votes.append(vote)
 
-    results = Counter(votes)  # 例: {"Python": 3, "JavaScript": 1}
+    results = Counter(votes)
     return dict(results)

@@ -38,22 +38,16 @@ export const VoteForm = () => {
   const [status, setStatus] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // ✅ Generate and save keys if they don't exist
+  // Generate and save keys if they don't exist
   useEffect(() => {
     const { privateKey, publicKey } = getKeys();
     if (!privateKey || !publicKey) {
-      console.log("🔑 Keys do not exist. Generating new ones...");
       saveKeys();
-    } else {
-      console.log("✅ Keys already exist.");
     }
   }, [getKeys, saveKeys]);
 
   const handleVote = async () => {
     const { privateKey, publicKey } = getKeys();
-
-    console.log("🛠️ Keys from localStorage:", { privateKey, publicKey });
-    console.log("🗳️ Selected language:", selected);
 
     if (!privateKey || !publicKey || !selected) {
       setStatus("⚠️ Key pair is missing or no language selected.");
@@ -61,15 +55,13 @@ export const VoteForm = () => {
     }
 
     const signature = signMessage(privateKey, selected);
-    console.log("✍️ Signature:", signature);
 
     try {
-      const res = await axios.post("http://localhost:5000/vote", {
+      await axios.post("http://localhost:5000/vote", {
         vote_data: selected,
         voter_public_key: publicKey,
         signature: signature,
       });
-      console.log("✅ Server response:", res.data);
       setStatus("✅ Vote submitted successfully!");
 
       setTimeout(() => {
@@ -78,7 +70,6 @@ export const VoteForm = () => {
 
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error(err.message);
         setStatus("❌ Vote failed (possibly invalid signature).");
       }
     }
@@ -94,7 +85,7 @@ export const VoteForm = () => {
         {[0, 1, 2].map((rowIndex) => (
           <div key={rowIndex} className="grid grid-cols-9 gap-0">
             {Array.from({ length: 9 }).map((_, colIndex) => {
-              const isIconSlot = colIndex % 2 === 1; // 1, 3, 5, 7 にだけアイコンを配置
+              const isIconSlot = colIndex % 2 === 1;
               const langIndex = rowIndex * 4 + Math.floor(colIndex / 2);
               const lang = languages[langIndex];
 
@@ -123,7 +114,6 @@ export const VoteForm = () => {
                   </div>
                 );
               } else {
-                // スペース用の空div
                 return <div key={`spacer-${rowIndex}-${colIndex}`} />;
               }
             })}
