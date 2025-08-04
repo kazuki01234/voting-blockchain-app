@@ -3,8 +3,34 @@ import { useKeys } from "../hooks/useKeys";
 import { signMessage } from "../crypto";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import pythonIcon from "../assets/icons/python.svg";
+import javascriptIcon from "../assets/icons/javascript.svg";
+import javaIcon from "../assets/icons/java.svg";
+import rubyIcon from "../assets/icons/ruby.svg";
+import goIcon from "../assets/icons/go.svg";
+import rustIcon from "../assets/icons/rust.svg";
+import cppIcon from "../assets/icons/cpp.svg";
+import csharpIcon from "../assets/icons/csharp.svg";
+import phpIcon from "../assets/icons/php.svg";
+import swiftIcon from "../assets/icons/swift.svg";
+import kotlinIcon from "../assets/icons/kotlin.svg";
+import typescriptIcon from "../assets/icons/typescript.svg";
 
-const languages = ["Python", "JavaScript", "Rust", "Go"];
+
+const languages = [
+  { name: "Python", icon: pythonIcon },
+  { name: "JavaScript", icon: javascriptIcon },
+  { name: "Java", icon: javaIcon },
+  { name: "Ruby", icon: rubyIcon },
+  { name: "Go", icon: goIcon },
+  { name: "Rust", icon: rustIcon },
+  { name: "C++", icon: cppIcon },
+  { name: "C#", icon: csharpIcon },
+  { name: "PHP", icon: phpIcon },
+  { name: "Swift", icon: swiftIcon },
+  { name: "Kotlin", icon: kotlinIcon },
+  { name: "TypeScript", icon: typescriptIcon },
+];
 
 export const VoteForm = () => {
   const { getKeys, saveKeys } = useKeys();
@@ -12,30 +38,30 @@ export const VoteForm = () => {
   const [status, setStatus] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // ✅ 鍵がなければ生成して保存
+  // ✅ Generate and save keys if they don't exist
   useEffect(() => {
     const { privateKey, publicKey } = getKeys();
     if (!privateKey || !publicKey) {
-      console.log("🔑 鍵が存在しないので生成します");
+      console.log("🔑 Keys do not exist. Generating new ones...");
       saveKeys();
     } else {
-      console.log("✅ 鍵が既に存在しています");
+      console.log("✅ Keys already exist.");
     }
   }, [getKeys, saveKeys]);
 
   const handleVote = async () => {
     const { privateKey, publicKey } = getKeys();
 
-    console.log("🛠️ ローカルストレージの鍵:", { privateKey, publicKey });
-    console.log("🗳️ 選択された言語:", selected);
+    console.log("🛠️ Keys from localStorage:", { privateKey, publicKey });
+    console.log("🗳️ Selected language:", selected);
 
     if (!privateKey || !publicKey || !selected) {
-      setStatus("⚠️ 鍵が存在しないか、言語が選ばれていません");
+      setStatus("⚠️ Key pair is missing or no language selected.");
       return;
     }
 
     const signature = signMessage(privateKey, selected);
-    console.log("✍️ 署名:", signature);
+    console.log("✍️ Signature:", signature);
 
     try {
       const res = await axios.post("http://localhost:5000/vote", {
@@ -43,48 +69,76 @@ export const VoteForm = () => {
         voter_public_key: publicKey,
         signature: signature,
       });
-      console.log("✅ サーバー応答:", res.data);
-      setStatus("✅ 投票に成功しました！");
+      console.log("✅ Server response:", res.data);
+      setStatus("✅ Vote submitted successfully!");
 
       setTimeout(() => {
         navigate("/results");
       }, 1000);
 
     } catch (err: unknown) {
-        if (err instanceof Error) {
-          console.error(err.message);
-          setStatus("❌ 投票に失敗しました（不正な署名など）");
-        }
+      if (err instanceof Error) {
+        console.error(err.message);
+        setStatus("❌ Vote failed (possibly invalid signature).");
       }
+    }
   };
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-2xl text-center">
-      <h1 className="text-2xl font-bold mb-6">🗳️ 人気プログラミング言語投票</h1>
+      <h1 className="text-xl font-bold mb-6">
+        🗳️ Vote for Your Favorite Programming Language
+      </h1>
 
-      <div className="flex flex-col gap-4 mb-6">
-        {languages.map((lang) => (
-          <button
-            key={lang}
-            className={`py-2 rounded-xl font-medium border ${
-              selected === lang
-                ? "bg-blue-500 text-white border-blue-600"
-                : "bg-gray-100 hover:bg-gray-200 border-transparent"
-            }`}
-            onClick={() => setSelected(lang)}
-          >
-            {lang}
-          </button>
+      <div className="space-y-4 mb-8">
+        {[0, 1, 2].map((rowIndex) => (
+          <div key={rowIndex} className="grid grid-cols-9 gap-0">
+            {Array.from({ length: 9 }).map((_, colIndex) => {
+              const isIconSlot = colIndex % 2 === 1; // 1, 3, 5, 7 にだけアイコンを配置
+              const langIndex = rowIndex * 4 + Math.floor(colIndex / 2);
+              const lang = languages[langIndex];
+
+              if (isIconSlot && lang) {
+                return (
+                  <div key={lang.name} className="flex flex-col items-center justify-center">
+                    <button
+                      onClick={() =>
+                        setSelected((prev) => (prev === lang.name ? null : lang.name))
+                      }
+                      className={`transition-all rounded-full p-1 ${
+                        selected === lang.name
+                          ? "bg-blue-500 text-white scale-105 ring-2 ring-blue-300"
+                          : "bg-gray-100 hover:bg-gray-200"
+                      }`}
+                    >
+                      <div className="w-10 h-10 rounded-full overflow-hidden shadow">
+                        <img
+                          src={lang.icon}
+                          className="w-full h-full object-contain"
+                          alt={lang.name}
+                        />
+                      </div>
+                    </button>
+                    <span className="mt-1 text-sm font-medium text-center">{lang.name}</span>
+                  </div>
+                );
+              } else {
+                // スペース用の空div
+                return <div key={`spacer-${rowIndex}-${colIndex}`} />;
+              }
+            })}
+          </div>
         ))}
       </div>
 
       <button
-        className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 disabled:opacity-50"
-        disabled={!selected}
         onClick={handleVote}
+        disabled={!selected}
+        className={`vote-submit-button`}
       >
-        投票する
+        Submit Vote
       </button>
+
 
       {status && <p className="mt-4 text-sm text-gray-700">{status}</p>}
     </div>
