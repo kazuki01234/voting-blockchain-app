@@ -9,7 +9,6 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  /* background-color: #f0f0f0; */
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -30,7 +29,7 @@ button:focus-visible {
 }
 
 .vote-submit-button:disabled {
-  background-color: #cbd5e1; /* Tailwindの slate-300 に近い */
-  color: #6b7280; /* slate-500 */
+  background-color: #cbd5e1;
+  color: #6b7280;
   cursor: not-allowed;
 }

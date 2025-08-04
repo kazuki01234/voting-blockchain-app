@@ -12,12 +12,8 @@ class VoteRequest(BaseModel):
 
 @router.post("/")
 def submit_vote(vote: VoteRequest):
-    print("Received vote_data:", vote.vote_data)
-    print("Received voter_public_key:", vote.voter_public_key)
-    print("Received signature:", vote.signature)
 
     if not verify_vote(vote.voter_public_key, vote.vote_data, vote.signature):
-        print("Signature verification failed")
         raise HTTPException(status_code=400, detail="Invalid signature")
     
     blockchain.add_block([{

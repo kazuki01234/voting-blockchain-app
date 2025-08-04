@@ -1,5 +1,3 @@
-'use client'
-
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts'
 import { useEffect, useState } from 'react'
 
@@ -18,8 +16,6 @@ export default function ResultsChart() {
       const res = await fetch('http://localhost:5000/chain/results')
       const json = await res.json()
 
-      // サーバーのレスポンスに応じてデータ整形
-      // 例えば { "Alice": 3, "Bob": 5 } → [{ name: "Alice", votes: 3 }, ...]
       const formatted: ResultItem[] = Object.entries(json).map(([name, votes]) => ({
         name,
         votes: Number(votes),
