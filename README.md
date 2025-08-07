@@ -1,33 +1,58 @@
-# Electronic Voting System (Python-based Blockchain)
+# Electronic Voting System (Blockchain-Based)
 
 ## Overview
 
-This project is a self-built electronic voting system based on blockchain technology.  
-It aims to achieve security, transparency, and tamper detection in the voting process.
+This is a blockchain-based electronic voting system built as a personal project.  
+The goal is to explore how blockchain can provide **security**, **transparency**, and **tamper resistance** in digital voting.
 
-### System Components:
-1. Voter registration based on public keys  
-2. Voting with digital signatures  
-3. Grouping votes into blocks  
-4. Adding blocks to the chain (Proof-of-Work is optional)  
-5. Tamper detection and vote counting  
+## Key Features
 
-### Technologies Used:
-- Python standard libraries: `hashlib`, `json`, `time`  
-- Cryptography: `ecdsa` for elliptic curve signature  
-- Frontend: React with TypeScript for UI and key management  
-- Backend: FastAPI (Python) to handle vote validation and blockchain management  
+- **Digital Signature Verification**: Voters sign their vote using a private key; the backend verifies it using the corresponding public key.
+- **Block-Based Storage**: Valid votes are grouped into blocks and linked via cryptographic hashes.
+- **Tamper Detection**: The chain can be validated to detect any alteration in the vote history.
+- **Simple UI**: React-based frontend allows users to generate key pairs, sign votes, and view blockchain data.
 
-### Current Status:
-- UI and backend communication is established  
-- Votes are signed locally with private keys and verified on the server  
-- Blockchain stores validated votes as blocks  
-- Duplicate vote prevention is planned but not yet implemented  
+## Technologies
 
-### How to Use:
-- Generate or load your key pair in the UI (stored in localStorage)  
-- Select a programming language to vote for  
-- Sign the vote and submit it to the backend  
-- Backend verifies the signature and adds the vote to the blockchain  
+- **Frontend**: React + TypeScript + Vite
+- **Backend**: FastAPI (Python)
+- **Crypto**: ECDSA (Elliptic Curve Digital Signatures)
+- **Utilities**: Python standard libraries (`hashlib`, `json`, `time`)
+
+## Current Status
+
+- UI ↔ Backend communication works  
+- Votes are signed and verified properly  
+- Blockchain grows with each validated vote  
+- Duplicate vote prevention: *Planned*  
+- Blockchain persistence: *Planned*
+
+## Screenshots
+
+### Voting Interface
+
+<img src="./screenshots/voting_ui.png" alt="Voting Screen" width="400" />
 
 ---
+
+### Vote Results
+
+<img src="./screenshots/voting_results.png" alt="Vote Results" width="400" />
+
+## How to Use
+
+1. Launch the backend (`docker-compose build && docker-compose up -d`)
+2. Start the frontend (`cd frontend && npm install && npm run dev`)
+3. Open the UI in your browser
+4. Generate or load a key pair (stored in localStorage)
+5. Select an option and vote — your vote is signed and sent to the backend
+6. Backend verifies the signature and adds the vote to the blockchain
+
+---
+
+## Planned Improvements
+
+- Store the blockchain persistently (e.g., JSON or DB)
+- Enforce one vote per public key
+- Enhance blockchain visualization
+- Add unit tests and error handling
