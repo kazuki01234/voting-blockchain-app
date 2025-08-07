@@ -31,9 +31,7 @@ The goal is to explore how blockchain can provide **security**, **transparency**
 
 ### Voting Interface
 
-<img src="./screenshots/voting_ui.png" alt="Voting Screen" width="400" />
-
----
+<img src="./screenshots/voting_ui.png" alt="Voting Screen" width="500" />
 
 ### Vote Results
 
@@ -47,8 +45,6 @@ The goal is to explore how blockchain can provide **security**, **transparency**
 4. Generate or load a key pair (stored in localStorage)
 5. Select an option and vote — your vote is signed and sent to the backend
 6. Backend verifies the signature and adds the vote to the blockchain
-
----
 
 ## Planned Improvements
 
