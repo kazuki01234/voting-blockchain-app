@@ -25,7 +25,7 @@ The goal is to explore how blockchain can provide **security**, **transparency**
 - Votes are signed and verified properly  
 - Blockchain grows with each validated vote  
 - Duplicate vote prevention: *Planned*  
-- Blockchain persistence: *Planned*
+- Blockchain persistence: Implemented
 
 ## Screenshots
 
@@ -48,7 +48,6 @@ The goal is to explore how blockchain can provide **security**, **transparency**
 
 ## Planned Improvements
 
-- Store the blockchain persistently (e.g., JSON or DB)
 - Enforce one vote per public key
 - Enhance blockchain visualization
 - Add unit tests and error handling
