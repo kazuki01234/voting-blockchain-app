@@ -29,3 +29,15 @@ class Block:
             'nonce': self.nonce,
             'hash': self.hash
         }
+        
+    @classmethod
+    def from_dict(cls, data):
+        block = cls(
+            index=data['index'],
+            previous_hash=data['previous_hash'],
+            timestamp=data['timestamp'],
+            votes=data['votes'],
+            nonce=data.get('nonce', 0)
+        )
+        block.hash = data.get('hash', block.calculate_hash())
+        return block
