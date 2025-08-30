@@ -1,6 +1,5 @@
 {
   "devDependencies": {
-    "@types/axios": "^0.9.36",
     "@types/crypto-js": "^4.2.2",
     "@types/elliptic": "^6.4.18"
   },

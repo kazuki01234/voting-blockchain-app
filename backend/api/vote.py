@@ -12,14 +12,21 @@ class VoteRequest(BaseModel):
 
 @router.post("/")
 def submit_vote(vote: VoteRequest):
-
+     # Verify the signature
     if not verify_vote(vote.voter_public_key, vote.vote_data, vote.signature):
         raise HTTPException(status_code=400, detail="Invalid signature")
-    
-    blockchain.add_block([{
-        'vote': vote.vote_data,
-        'signature': vote.signature,
-        'voter': vote.voter_public_key
-    }])
-    
+
+    # Check one vote per person
+    if blockchain.has_voted(vote.voter_public_key):
+        raise HTTPException(status_code=400, detail="This public key has already voted")
+
+    try:
+        blockchain.add_block([{
+            "voter": vote.voter_public_key,
+            "vote": vote.vote_data,
+            "signature": vote.signature
+        }])
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     return {"message": "Vote added to blockchain"}
