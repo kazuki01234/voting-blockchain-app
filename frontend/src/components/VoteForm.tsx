@@ -36,6 +36,7 @@ export const VoteForm = () => {
   const { getKeys, saveKeys } = useKeys();
   const [selected, setSelected] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const [hasVoted, setHasVoted] = useState<boolean>(false);
   const navigate = useNavigate();
 
   // Generate and save keys if they don't exist
@@ -43,6 +44,11 @@ export const VoteForm = () => {
     const { privateKey, publicKey } = getKeys();
     if (!privateKey || !publicKey) {
       saveKeys();
+    }
+
+    if (publicKey) {
+      const voted = localStorage.getItem(`voted_${publicKey}`);
+      if (voted) setHasVoted(true);
     }
   }, [getKeys, saveKeys]);
 
@@ -62,23 +68,30 @@ export const VoteForm = () => {
         voter_public_key: publicKey,
         signature: signature,
       });
+
       setStatus("✅ Vote submitted successfully!");
+      localStorage.setItem(`voted_${publicKey}`, "true");
+      setHasVoted(true);
 
       setTimeout(() => {
         navigate("/results");
       }, 1000);
 
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setStatus("❌ Vote failed (possibly invalid signature).");
+      if (axios.isAxiosError(err)) {
+        setStatus(`❌ Vote failed: ${err.response?.data?.detail || err.message}`);
+      } else if (err instanceof Error) {
+        setStatus(`❌ Vote failed: ${err.message}`);
+      } else {
+        setStatus("❌ Vote failed (unknown error).");
       }
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-2xl text-center">
+    <div className="p-6 bg-white shadow-md rounded-2xl text-center">
       <h1 className="text-xl font-bold mb-6">
-        🗳️ Vote for Your Favorite Programming Language
+        Vote for Your Favorite Programming Language
       </h1>
 
       <div className="space-y-4 mb-8">
@@ -101,6 +114,7 @@ export const VoteForm = () => {
                           ? "bg-blue-500 text-white scale-105 ring-2 ring-blue-300"
                           : "bg-gray-100 hover:bg-gray-200"
                       }`}
+                      disabled={hasVoted}
                     >
                       <div className="w-10 h-10 rounded-full overflow-hidden shadow">
                         <img
@@ -121,15 +135,25 @@ export const VoteForm = () => {
         ))}
       </div>
 
-      <button
-        onClick={handleVote}
-        disabled={!selected}
-        className={`vote-submit-button`}
-      >
-        Submit Vote
-      </button>
+      <div className="flex flex-col items-center space-y-2">
+        <button
+          onClick={handleVote}
+          disabled={!selected || hasVoted}
+          className={`block w-[200px] py-2
+            ${!selected || hasVoted ? "bg-gray-300 text-gray-600 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"}`}
+        >
+          {hasVoted ? "✅ Already Voted" : "Submit Vote"}
+        </button>
 
-
+        <button
+          onClick={() => navigate("/results")}
+          disabled={!hasVoted}
+          className={`block w-[200px] py-2
+            ${hasVoted ? "bg-orange-500 text-white hover:bg-orange-600" : "bg-gray-300 text-gray-600 cursor-not-allowed"}`}
+        >
+          View Results
+        </button>
+      </div>
       {status && <p className="mt-4 text-sm text-gray-700">{status}</p>}
     </div>
   );

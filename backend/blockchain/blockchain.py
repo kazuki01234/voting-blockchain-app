@@ -1,46 +1,61 @@
 import time, json, os
 from .block import Block
 
+DATA_FILE = "data/blockchain.json"
+
+
 class Blockchain:
-    def __init__(self, path='data/blockchain.json'):
-        self.path = path
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        if os.path.exists(self.path):
-            self.chain = self.load()
-        else:
-            self.chain = [self.create_genesis_block()]
+    def __init__(self):
+        self.chain = []
+        self.voted_public_keys = set()
+        self.load()
 
     def create_genesis_block(self):
-        return Block(0, '0', time.time(), votes=[])
+        return Block(0, "0", int(time.time()), votes=[])
 
     def get_latest_block(self):
         return self.chain[-1]
 
     def add_block(self, votes):
-        prev = self.get_latest_block()
-        new_block = Block(prev.index + 1, prev.hash, time.time(), votes)
-        self.chain.append(new_block)
-        self.save()
+        for v in votes:
+            if v['voter'] in self.voted_public_keys:
+                raise ValueError(f"Public key {v['voter']} has already voted")
 
-    def is_valid_chain(self):
-        for i in range(1, len(self.chain)):
-            current = self.chain[i]
-            prev = self.chain[i - 1]
-            if current.hash != current.calculate_hash():
-                return False
-            if current.previous_hash != prev.hash:
-                return False
-        return True
-    
-    def save(self, path='data/blockchain.json'):
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, 'w') as f:
-            json.dump([block.to_dict() for block in self.chain], f, indent=2)
-            
-    def load(self, path='data/blockchain.json'):
-        if os.path.exists(path):
-            with open(path) as f:
+        prev_block = self.get_latest_block()
+        new_block = Block(
+            index=prev_block.index + 1,
+            previous_hash=prev_block.hash,
+            timestamp=int(time.time()),
+            votes=votes
+        )
+        self.chain.append(new_block)
+
+        for v in votes:
+            self.voted_public_keys.add(v['voter'])
+
+        self.save()
+        return new_block
+
+    def has_voted(self, public_key: str) -> bool:
+        return public_key in self.voted_public_keys
+
+    def save(self):
+        data = {
+            "chain": [b.to_dict() for b in self.chain],
+            "voted_public_keys": list(self.voted_public_keys)
+        }
+        os.makedirs("data", exist_ok=True)
+        with open(DATA_FILE, "w") as f:
+            json.dump(data, f, indent=4)
+
+    def load(self):
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, "r") as f:
                 data = json.load(f)
-                return [Block.from_dict(block_data) for block_data in data]
+                self.chain = [Block.from_dict(b) for b in data.get("chain", [])]
+                self.voted_public_keys = set(data.get("voted_public_keys", []))
         else:
-            return [self.create_genesis_block()]
+            genesis = self.create_genesis_block()
+            self.chain = [genesis]
+            self.voted_public_keys = set()
+            self.save()

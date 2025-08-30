@@ -11,25 +11,6 @@ button {
   font-family: inherit;
   cursor: pointer;
   transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-.vote-submit-button {
-  background-color: #06b6d4;
-  color: white;
-}
-.vote-submit-button:hover {
-  background-color: #0891b2;
-}
-
-.vote-submit-button:disabled {
-  background-color: #cbd5e1;
-  color: #6b7280;
-  cursor: not-allowed;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
