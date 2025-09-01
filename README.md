@@ -11,6 +11,7 @@ The goal is to explore how blockchain can provide **security**, **transparency**
 - **Block-Based Storage**: Valid votes are grouped into blocks and linked via cryptographic hashes.
 - **Tamper Detection**: The chain can be validated to detect any alteration in the vote history.
 - **Simple UI**: React-based frontend allows users to generate key pairs, sign votes, and view blockchain data.
+- **One Vote Per Public Key**: Ensures each voter can cast only a single vote.
 
 ## Technologies
 
@@ -24,7 +25,7 @@ The goal is to explore how blockchain can provide **security**, **transparency**
 - UI ↔ Backend communication works  
 - Votes are signed and verified properly  
 - Blockchain grows with each validated vote  
-- Duplicate vote prevention: *Planned*  
+- Duplicate vote prevention: Implemented
 - Blockchain persistence: Implemented
 
 ## Screenshots
@@ -48,6 +49,5 @@ The goal is to explore how blockchain can provide **security**, **transparency**
 
 ## Planned Improvements
 
-- Enforce one vote per public key
 - Enhance blockchain visualization
 - Add unit tests and error handling
