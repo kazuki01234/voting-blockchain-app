@@ -1,6 +1,6 @@
 .env
 
-/backend/data/*
+/backend_python/data/*
 folder_structure.txt
 
 __pycache__/

@@ -38,6 +38,7 @@ export const VoteForm = () => {
   const [status, setStatus] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState<boolean>(false);
   const navigate = useNavigate();
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   // Generate and save keys if they don't exist
   useEffect(() => {
@@ -63,7 +64,7 @@ export const VoteForm = () => {
     const signature = signMessage(privateKey, selected);
 
     try {
-      await axios.post("http://localhost:5000/vote", {
+      await axios.post(`${BACKEND_URL}/vote`, {
         vote_data: selected,
         voter_public_key: publicKey,
         signature: signature,
