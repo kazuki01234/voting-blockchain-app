@@ -10,10 +10,11 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF6384']
 
 export default function ResultsChart() {
   const [data, setData] = useState<ResultItem[]>([])
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await fetch('http://localhost:5000/chain/results')
+      const res = await fetch(`${BACKEND_URL}/chain/results`)
       const json = await res.json()
 
       const formatted: ResultItem[] = Object.entries(json).map(([name, votes]) => ({
@@ -24,7 +25,7 @@ export default function ResultsChart() {
     }
 
     fetchData()
-  }, [])
+  }, [BACKEND_URL])
 
   return (
     <div className="flex justify-center items-center w-full">
