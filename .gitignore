@@ -1,6 +1,7 @@
 .env
 
 /backend_python/data/*
+/backend_go/data/*
 folder_structure.txt
 
 __pycache__/
