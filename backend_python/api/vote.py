@@ -12,11 +12,9 @@ class VoteRequest(BaseModel):
 
 @router.post("/")
 def submit_vote(vote: VoteRequest):
-     # Verify the signature
     if not verify_vote(vote.voter_public_key, vote.vote_data, vote.signature):
         raise HTTPException(status_code=400, detail="Invalid signature")
 
-    # Check one vote per person
     if blockchain.has_voted(vote.voter_public_key):
         raise HTTPException(status_code=400, detail="This public key has already voted")
 

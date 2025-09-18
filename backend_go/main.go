@@ -16,12 +16,10 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	// ルートパス
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "Blockchain-based Voting System API (Go)"})
 	})
 
-	// APIルート登録
 	api.RegisterRoutes(r)
 
 	r.Run("0.0.0.0:5001")

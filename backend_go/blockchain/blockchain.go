@@ -11,14 +11,12 @@ import (
 	"fmt"
 )
 
-// Transaction は1つの投票を表す
 type Transaction struct {
 	Voter     string `json:"voter"`
 	Vote      string `json:"vote"`
 	Signature string `json:"signature"`
 }
 
-// Block はブロックを表す
 type Block struct {
 	Index        int           `json:"index"`
 	PreviousHash string        `json:"previous_hash"`
@@ -28,7 +26,6 @@ type Block struct {
 	Hash         string        `json:"hash"`
 }
 
-// Blockchain はブロックチェーンを表す
 type Blockchain struct {
 	Chain           []Block
 	VotedPublicKeys map[string]struct{}
@@ -37,10 +34,8 @@ type Blockchain struct {
 
 const DataFile = "data/blockchain.json"
 
-// グローバルインスタンス
 var BlockchainInstance = NewBlockchain()
 
-// NewBlockchain はブロックチェーンを初期化する
 func NewBlockchain() *Blockchain {
 	bc := &Blockchain{
 		Chain:           []Block{},
@@ -56,7 +51,6 @@ func NewBlockchain() *Blockchain {
 	return bc
 }
 
-// createGenesisBlock は最初のブロックを作成
 func (bc *Blockchain) createGenesisBlock() Block {
 	b := Block{
 		Index:        0,
@@ -69,7 +63,6 @@ func (bc *Blockchain) createGenesisBlock() Block {
 	return b
 }
 
-// calculateHash はブロックのハッシュを計算
 func (b *Block) calculateHash() string {
 	voteBytes, _ := json.Marshal(b.Votes)
     record := fmt.Sprintf("%d%s%d%s%d", b.Index, b.PreviousHash, b.Timestamp, voteBytes, b.Nonce)
@@ -77,24 +70,18 @@ func (b *Block) calculateHash() string {
 	return hex.EncodeToString(sum[:])
 }
 
-// GetLatestBlock は最新ブロックを返す
 func (bc *Blockchain) GetLatestBlock() Block {
 	bc.mu.Lock()
 	defer bc.mu.Unlock()
 	return bc.Chain[len(bc.Chain)-1]
 }
 
-// AddBlock はブロックを追加
 func (bc *Blockchain) AddBlock(votes []Transaction) (Block, error) {
     bc.mu.Lock()
     defer bc.mu.Unlock()
 
-    fmt.Println("[DEBUG] AddBlock called with votes:", votes)
-
-    // 既に投票済みチェック
     for _, v := range votes {
         if _, ok := bc.VotedPublicKeys[v.Voter]; ok {
-            fmt.Println("[DEBUG] Voter already exists:", v.Voter)
             return Block{}, errors.New("this public key has already voted")
         }
     }
@@ -115,22 +102,13 @@ func (bc *Blockchain) AddBlock(votes []Transaction) (Block, error) {
         bc.VotedPublicKeys[v.Voter] = struct{}{}
     }
 
-    fmt.Println("[DEBUG] New block created:", newBlock)
-
-    // 非同期で保存
     go func() {
-        fmt.Println("[DEBUG] Save goroutine started")
-        if err := bc.Save(); err != nil {
-            fmt.Println("Failed to save blockchain:", err)
-        } else {
-            fmt.Println("[DEBUG] Blockchain saved successfully")
-        }
-    }()
+		_ = bc.Save()
+	}()
 
     return newBlock, nil
 }
 
-// HasVoted は既に投票済みか確認
 func (bc *Blockchain) HasVoted(pubKey string) bool {
 	bc.mu.Lock()
 	defer bc.mu.Unlock()
@@ -138,7 +116,6 @@ func (bc *Blockchain) HasVoted(pubKey string) bool {
 	return ok
 }
 
-// GetResults は投票結果を集計
 func (bc *Blockchain) GetResults() map[string]int {
 	bc.mu.Lock()
 	defer bc.mu.Unlock()
@@ -151,24 +128,19 @@ func (bc *Blockchain) GetResults() map[string]int {
 	return results
 }
 
-// GetChain はチェーン全体を返す
 func (bc *Blockchain) GetChain() []Block {
 	bc.mu.Lock()
 	defer bc.mu.Unlock()
 	return bc.Chain
 }
 
-// Save はブロックチェーンをファイルに保存
 func (bc *Blockchain) Save() error {
     bc.mu.Lock()
     defer bc.mu.Unlock()
 
-    fmt.Println("[DEBUG] Save() called")
-
     os.MkdirAll("data", os.ModePerm)
     file, err := os.Create(DataFile)
     if err != nil {
-        fmt.Println("[DEBUG] os.Create error:", err)
         return err
     }
     defer file.Close()
@@ -187,22 +159,17 @@ func (bc *Blockchain) Save() error {
     enc := json.NewEncoder(file)
     enc.SetIndent("", "  ")
     err = enc.Encode(data)
-    if err != nil {
-        fmt.Println("[DEBUG] json.Encode error:", err)
-    } else {
-        fmt.Println("[DEBUG] json.Encode success, written to", DataFile)
-    }
+
     return err
 }
 
-// Load はブロックチェーンをファイルから読み込み
 func (bc *Blockchain) Load() error {
 	bc.mu.Lock()
 	defer bc.mu.Unlock()
 
 	file, err := os.Open(DataFile)
 	if err != nil {
-		return nil // ファイルがなければGenesisでOK
+		return nil
 	}
 	defer file.Close()
 
