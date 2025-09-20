@@ -13,6 +13,7 @@ The system includes **two separate backends** — one implemented in **Python (F
 - **Block-Based Storage**: Valid votes are grouped into blocks and linked via cryptographic hashes.
 - **Tamper Detection**: The chain can be validated to detect any alteration in the vote history.
 - **Simple UI**: React-based frontend allows users to generate key pairs, sign votes, and view blockchain data.
+- **Blockchain Visualizer**: Interactive page to view all blocks, transactions, and vote details.
 - **One Vote Per Public Key**: Ensures each voter can cast only a single vote.
 - **Two Backend Implementations**:
   - **Python (FastAPI)**: Quick development and easy prototyping
@@ -32,8 +33,9 @@ The system includes **two separate backends** — one implemented in **Python (F
 - UI ↔ Backend communication works (both Python and Go versions)  
 - Votes are signed and verified properly  
 - Blockchain grows with each validated vote  
-- Duplicate vote prevention: Implemented  
-- Blockchain persistence: Implemented  
+- Duplicate vote prevention: Implemented
+- Blockchain persistence: Implemented
+- Blockchain visualization: Implemented
 
 ## Screenshots
 
@@ -44,6 +46,10 @@ The system includes **two separate backends** — one implemented in **Python (F
 ### Vote Results
 
 <img src="./screenshots/voting_results.png" alt="Vote Results" width="400" />
+
+### Blockchain Visualizer
+
+<img src="./screenshots/blockchain_visualizer.png" alt="Blockchain Visualizer" width="600" />
 
 ## How to Use
 
@@ -61,6 +67,5 @@ The system includes **two separate backends** — one implemented in **Python (F
 
 ## Planned Improvements
 
-- Enhance blockchain visualization
 - Add unit tests and error handling
 - Benchmark performance differences between Python and Go backends
