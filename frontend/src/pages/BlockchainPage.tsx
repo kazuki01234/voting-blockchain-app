@@ -1,13 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import ResultsChart from "../components/ResultsChart";
+import { BlockchainVisualizer } from "../components/BlockchainVisualizer";
 
-const ResultsPage: React.FC = () => {
+const BlockchainPage: React.FC = () => {
   return (
     <div className="w-full max-w-3xl p-4 mx-auto">
-      <h1 className="text-2xl font-bold text-center mb-4">Voting Results</h1>
-
-      <ResultsChart />
+      <h1 className="text-2xl font-bold text-center mb-4">Blockchain Visualizer</h1>
+      <BlockchainVisualizer />
 
       <div className="flex justify-center space-x-4 mt-6">
         <Link
@@ -18,14 +17,14 @@ const ResultsPage: React.FC = () => {
         </Link>
 
         <Link
-          to="/blockchain"
-          className="block w-[200px] py-2 bg-green-500 text-white text-center rounded hover:bg-green-600"
+          to="/results"
+          className="block w-[200px] py-2 bg-orange-500 text-white text-center rounded hover:bg-orange-600"
         >
-          View Blockchain
+          View Results
         </Link>
       </div>
     </div>
   );
 };
 
-export default ResultsPage;
+export default BlockchainPage;
