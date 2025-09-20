@@ -49,8 +49,11 @@ export const BlockchainVisualizer: React.FC = () => {
   return (
     <div className="space-y-4 p-4">
       {chain.map((block) => (
-        <div key={block.index} className="border rounded-lg p-4 shadow">
-          <h3 className="font-bold mb-2">Block #{block.index}</h3>
+        <div
+          key={block.index}
+          className="bg-gray-800 text-white border border-gray-700 rounded-lg p-4 shadow-lg"
+        >
+          <h3 className="font-bold mb-2 text-lg">Block #{block.index}</h3>
           <p><strong>Previous Hash:</strong> {block.previous_hash}</p>
           <p><strong>Hash:</strong> {block.hash}</p>
           <p><strong>Timestamp:</strong> {new Date(block.timestamp * 1000).toLocaleString()}</p>
@@ -63,7 +66,7 @@ export const BlockchainVisualizer: React.FC = () => {
               block.votes.map((v, i) => {
                 const shortVoter = `${v.voter.slice(0, 10)}...${v.voter.slice(-10)}`;
                 return (
-                    <div key={i} className="bg-gray-100 p-2 rounded">
+                    <div key={i} className="bg-gray-700 text-white p-2 rounded mt-2">
                     <p><strong>Voter:</strong> {shortVoter}</p>
                     <p><strong>Vote:</strong> {v.vote}</p>
                     </div>

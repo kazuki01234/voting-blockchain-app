@@ -90,8 +90,8 @@ export const VoteForm = () => {
   };
 
   return (
-    <div className="p-6 bg-white shadow-md rounded-2xl text-center">
-      <h1 className="text-xl font-bold mb-6">
+    <div className="p-6 text-center">
+      <h1 className="text-2xl font-bold mb-6 text-white">
         Vote for Your Favorite Programming Language
       </h1>
 
@@ -105,7 +105,7 @@ export const VoteForm = () => {
 
               if (isIconSlot && lang) {
                 return (
-                  <div key={lang.name} className="flex flex-col items-center justify-center">
+                  <div key={lang.name} className="flex flex-col items-center justify-center text-white">
                     <button
                       onClick={() =>
                         setSelected((prev) => (prev === lang.name ? null : lang.name))
@@ -117,7 +117,7 @@ export const VoteForm = () => {
                       }`}
                       disabled={hasVoted}
                     >
-                      <div className="w-10 h-10 rounded-full overflow-hidden shadow">
+                      <div className="w-12 h-12 rounded-full overflow-hidden shadow">
                         <img
                           src={lang.icon}
                           className="w-full h-full object-contain"
@@ -125,7 +125,7 @@ export const VoteForm = () => {
                         />
                       </div>
                     </button>
-                    <span className="mt-1 text-sm font-medium text-center">{lang.name}</span>
+                    <span className="mt-1 text-base font-medium text-center">{lang.name}</span>
                   </div>
                 );
               } else {
@@ -136,7 +136,7 @@ export const VoteForm = () => {
         ))}
       </div>
 
-      <div className="flex flex-col items-center space-y-2">
+      <div className="flex justify-center gap-4">
         <button
           onClick={handleVote}
           disabled={!selected || hasVoted}
@@ -155,7 +155,7 @@ export const VoteForm = () => {
           View Results
         </button>
       </div>
-      {status && <p className="mt-4 text-sm text-gray-700">{status}</p>}
+      {status && <p className="mt-4 text-sm text-gray-200">{status}</p>}
     </div>
   );
 };

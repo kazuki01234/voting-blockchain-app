@@ -6,7 +6,7 @@ import BlockchainPage from "./pages/BlockchainPage";
 const App = () => {
   return (
     <Router>
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <main className="min-h-screen bg-gray-900 flex items-center justify-center">
         <Routes>
           <Route path="/" element={<VoteForm />} />
           <Route path="/results" element={<ResultsPage />} />

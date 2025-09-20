@@ -5,7 +5,7 @@ import ResultsChart from "../components/ResultsChart";
 const ResultsPage: React.FC = () => {
   return (
     <div className="w-full max-w-3xl p-4 mx-auto">
-      <h1 className="text-2xl font-bold text-center mb-4">Voting Results</h1>
+      <h1 className="text-2xl font-bold text-center mb-4 text-white">Voting Results</h1>
 
       <ResultsChart />
 
