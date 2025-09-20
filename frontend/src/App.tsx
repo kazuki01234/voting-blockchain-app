@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { VoteForm } from "./components/VoteForm";
 import ResultsPage from "./pages/ResultsPage";
+import BlockchainPage from "./pages/BlockchainPage";
 
 const App = () => {
   return (
@@ -9,6 +10,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<VoteForm />} />
           <Route path="/results" element={<ResultsPage />} />
+          <Route path="/blockchain" element={<BlockchainPage />} />
         </Routes>
       </main>
     </Router>
