@@ -1,30 +1,38 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from crypto.keys import verify_vote
+from crypto.keys import verify_signature, hash_public_key
+from crypto.zkp import verify_proof
 from blockchain.shared import blockchain
 
 router = APIRouter()
 
 class VoteRequest(BaseModel):
     voter_public_key: str
-    vote_data: str
+    proof: str
     signature: str
 
 @router.post("/")
 def submit_vote(vote: VoteRequest):
-    if not verify_vote(vote.voter_public_key, vote.vote_data, vote.signature):
+
+    voter_hash = hash_public_key(vote.voter_public_key)
+
+    if not verify_signature(
+        vote.voter_public_key,
+        f"{vote.proof}|{voter_hash}",
+        vote.signature
+    ):
         raise HTTPException(status_code=400, detail="Invalid signature")
 
-    if blockchain.has_voted(vote.voter_public_key):
-        raise HTTPException(status_code=400, detail="This public key has already voted")
+    if blockchain.has_voted(voter_hash):
+        raise HTTPException(status_code=400, detail="This voter has already voted")
 
-    try:
-        blockchain.add_block([{
-            "voter": vote.voter_public_key,
-            "vote": vote.vote_data,
-            "signature": vote.signature
-        }])
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    if not verify_proof(vote.proof):
+        raise HTTPException(status_code=400, detail="Invalid ZKP proof")
+
+    blockchain.add_block([{
+        "voter_hash": voter_hash,
+        "proof": vote.proof,
+        "proof_valid": True
+    }])
 
     return {"message": "Vote added to blockchain"}

@@ -3,6 +3,8 @@ import { useKeys } from "../hooks/useKeys";
 import { signMessage } from "../crypto";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { generateProof, hashPublicKey } from "../crypto/zkp";
+
 import pythonIcon from "../assets/icons/python.svg";
 import javascriptIcon from "../assets/icons/javascript.svg";
 import javaIcon from "../assets/icons/java.svg";
@@ -15,7 +17,6 @@ import phpIcon from "../assets/icons/php.svg";
 import swiftIcon from "../assets/icons/swift.svg";
 import kotlinIcon from "../assets/icons/kotlin.svg";
 import typescriptIcon from "../assets/icons/typescript.svg";
-
 
 const languages = [
   { name: "Python", icon: pythonIcon },
@@ -36,11 +37,11 @@ export const VoteForm = () => {
   const { getKeys, saveKeys } = useKeys();
   const [selected, setSelected] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
-  const [hasVoted, setHasVoted] = useState<boolean>(false);
+  const [hasVoted, setHasVoted] = useState(false);
   const navigate = useNavigate();
+
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-  // Generate and save keys if they don't exist
   useEffect(() => {
     const { privateKey, publicKey } = getKeys();
     if (!privateKey || !publicKey) {
@@ -57,105 +58,114 @@ export const VoteForm = () => {
     const { privateKey, publicKey } = getKeys();
 
     if (!privateKey || !publicKey || !selected) {
-      setStatus("⚠️ Key pair is missing or no language selected.");
+      setStatus("⚠️ Key pair missing or no vote selected.");
       return;
     }
 
-    const signature = signMessage(privateKey, selected);
-
     try {
+      // voter_hash（匿名識別子）
+      const voterHash = hashPublicKey(publicKey);
+      // ZKP proof（最低限スタブ）
+      const proof = generateProof(selected, voterHash);
+      // 署名（proof + voter_hash）
+      const message = `${proof}|${voterHash}`;
+      // 投票送信（vote は送らない）
+      const signature = signMessage(privateKey, message);
+
       await axios.post(`${BACKEND_URL}/vote`, {
-        vote_data: selected,
         voter_public_key: publicKey,
-        signature: signature,
+        proof,
+        signature,
       });
 
-      setStatus("✅ Vote submitted successfully!");
+      setStatus("✅ Vote submitted (ZKP verified)");
       localStorage.setItem(`voted_${publicKey}`, "true");
       setHasVoted(true);
 
-      setTimeout(() => {
-        navigate("/results");
-      }, 1000);
-
+      setTimeout(() => navigate("/blockchain"), 1000);
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        setStatus(`❌ Vote failed: ${err.response?.data?.detail || err.message}`);
-      } else if (err instanceof Error) {
-        setStatus(`❌ Vote failed: ${err.message}`);
+        setStatus(`❌ ${err.response?.data?.detail || err.message}`);
       } else {
-        setStatus("❌ Vote failed (unknown error).");
+        setStatus("❌ Vote failed.");
       }
     }
+  };
+
+  const handleViewBlockchain = () => {
+    navigate("/blockchain");
   };
 
   return (
     <div className="p-6 text-center">
       <h1 className="text-2xl font-bold mb-6 text-white">
-        Vote for Your Favorite Programming Language
+        Vote (ZKP Protected)
       </h1>
 
       <div className="space-y-4 mb-8">
-        {[0, 1, 2].map((rowIndex) => (
-          <div key={rowIndex} className="grid grid-cols-9 gap-0">
-            {Array.from({ length: 9 }).map((_, colIndex) => {
-              const isIconSlot = colIndex % 2 === 1;
-              const langIndex = rowIndex * 4 + Math.floor(colIndex / 2);
+        {[0, 1, 2].map((row) => (
+          <div key={row} className="grid grid-cols-9 gap-0">
+            {Array.from({ length: 9 }).map((_, col) => {
+              const isIconSlot = col % 2 === 1;
+              const langIndex = row * 4 + Math.floor(col / 2);
               const lang = languages[langIndex];
 
               if (isIconSlot && lang) {
                 return (
-                  <div key={lang.name} className="flex flex-col items-center justify-center text-white">
+                  <div
+                    key={lang.name}
+                    className="flex flex-col items-center justify-center text-white"
+                  >
                     <button
                       onClick={() =>
-                        setSelected((prev) => (prev === lang.name ? null : lang.name))
+                        setSelected((prev) =>
+                          prev === lang.name ? null : lang.name
+                        )
                       }
+                      disabled={hasVoted}
                       className={`transition-all rounded-full p-1 ${
                         selected === lang.name
-                          ? "bg-blue-500 text-white scale-105 ring-2 ring-blue-300"
+                          ? "bg-blue-500 ring-2 ring-blue-300 scale-105"
                           : "bg-gray-100 hover:bg-gray-200"
                       }`}
-                      disabled={hasVoted}
                     >
                       <div className="w-12 h-12 rounded-full overflow-hidden shadow">
                         <img
                           src={lang.icon}
-                          className="w-full h-full object-contain"
                           alt={lang.name}
+                          className="w-full h-full object-contain"
                         />
                       </div>
                     </button>
-                    <span className="mt-1 text-base font-medium text-center">{lang.name}</span>
+                    <span className="mt-1 text-base font-medium text-center">
+                      {lang.name}
+                    </span>
                   </div>
                 );
-              } else {
-                return <div key={`spacer-${rowIndex}-${colIndex}`} />;
               }
+              return <div key={`${row}-${col}`} />;
             })}
           </div>
         ))}
       </div>
 
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-center space-x-4">
         <button
           onClick={handleVote}
           disabled={!selected || hasVoted}
-          className={`block w-[200px] py-2
-            ${!selected || hasVoted ? "bg-gray-300 text-gray-600 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"}`}
+          className="bg-blue-500 text-white px-6 py-2 rounded"
         >
           {hasVoted ? "✅ Already Voted" : "Submit Vote"}
         </button>
-
         <button
-          onClick={() => navigate("/results")}
-          disabled={!hasVoted}
-          className={`block w-[200px] py-2
-            ${hasVoted ? "bg-orange-500 text-white hover:bg-orange-600" : "bg-gray-300 text-gray-600 cursor-not-allowed"}`}
+          onClick={handleViewBlockchain}
+          className="bg-gray-700 text-white px-6 py-2 rounded"
         >
-          View Results
+          View Blockchain
         </button>
       </div>
-      {status && <p className="mt-4 text-sm text-gray-200">{status}</p>}
+
+      {status && <p className="mt-4 text-gray-200">{status}</p>}
     </div>
   );
 };
